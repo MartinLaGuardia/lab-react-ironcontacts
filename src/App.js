@@ -1,22 +1,73 @@
-import contactsFromJson from "./contacts.json";
-import './App.css';
+import contactsFromApi from "./contacts.json";
 import { useState } from 'react'
+import './App.css';
+
 
 function App() {
 
-  const [contacts, setContactsList] = useState(contactsFromJson)
+  const contactCopy = [...contactsFromApi]
+  const firstFive = contactCopy.slice(0, 5)
+  const [contacts, setContactsList] = useState(firstFive)
 
-  let firstFive = contacts.slice(10, 15)
+  const oneRandomContact = () => {
+    let result = contactsFromApi[Math.floor(Math.random() * 52)];
 
-  let removeContact = contactID => {
-    const newContacts = contacts.filter(elm => elm.id != contactID)              // retorna nuevo array
-    setContactsList(newContacts)
+    let contactsCopy2
+
+    if (firstFive.indexOf(contactsFromApi) === -1) {
+      contactsCopy2 = [...contacts]
+      contactsCopy2.push(result)
+      firstFive.push(result)
+    }
+    setContactsList(contactsCopy2)
+
+    return firstFive
+
   }
+
+  const sortPopularity = () => {
+    let popularity = [...contacts].sort((firstCelebrity, secondCelebrity) => secondCelebrity.popularity - firstCelebrity.popularity)
+
+    setContactsList(popularity)
+  }
+
+  const sortName = () => {
+    let name = [...contactsFromApi].sort((firstCelebrity, secondCelebrity) => secondCelebrity.name > firstCelebrity.name ? 1 : -1)
+
+    setContactsList(name)
+  }
+
+  const deleteCelebrity = celebrityID => {
+    let newCelebrities = contacts.filter(elm => elm.id !== celebrityID)
+
+    setContactsList(newCelebrities)
+  }
+
 
   return (
 
-    <div className="App">
-      <table>
+    <div classname="app">
+      <h1>IronContacts</h1>
+
+      <div className="but">
+
+        <div>
+          <button onClick={oneRandomContact}>ADD RANDOM CONTACT</button>
+        </div>
+
+        <div>
+          <button onClick={sortPopularity}>SORT BY POPULARITY</button>
+        </div>
+
+        <div>
+          <button onClick={sortName}>SORT BY NAME</button>
+        </div>
+      </div>
+
+      <br></br>
+
+
+      <table className="table">
         <tr>
           <th>Picture:</th>
           <th>Name:</th>
@@ -26,27 +77,27 @@ function App() {
         </tr>
 
         {
-          firstFive.map(contact => {
+          contacts?.map((contact, index) => {
             return (
-              <tr>
 
-                <td>{contact.name}</td>
+              <tr key={index}>
                 <td><img src={contact.pictureUrl}></img></td>
+                <td>{contact.name}:</td>
                 <td>{contact.popularity}</td>
-                <td>{contact.wonOscar ? <p> 🏆  </p> : <p>No tuvo Oscar</p>}</td>
-                <td>{contact.wonEmmy ? <p> 🏆  </p> : <p>No tuvo Emmy</p>}</td>
-                <td><button className="btn-delete" onClick={() => removeContact(contact.id)
-                }>Delete</button></td>
+                <td>{contact.wonOscar ? <p> 🏆 </p> : <p> 🧌 </p>}</td>
+                <td>{contact.wonEmmy ? <p> 🏆 </p> : <p> 🥭 </p>}</td>
+                <td><button onClick={() => deleteCelebrity(contact.id)}>DELETE CELEBRITY</button></td>
 
               </tr>
+
             )
           })
         }
       </table>
 
-
-
     </div>
+
+
   )
 }
 
